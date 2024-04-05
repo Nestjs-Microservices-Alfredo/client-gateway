@@ -1,7 +1,7 @@
-import { BadRequestException, Inject, Injectable } from '@nestjs/common';
+import {  Inject, Injectable } from '@nestjs/common';
 import { CreateProductDto, UpdateProductDto } from './dto';
 import { ClientProxy, RpcException } from '@nestjs/microservices';
-import { PRODUCT_SERVICES } from './../config';
+import { NATS_SERVICE } from './../config';
 import { firstValueFrom } from 'rxjs';
 import { PaginationDto } from './../common';
 
@@ -9,12 +9,12 @@ import { PaginationDto } from './../common';
 export class ProductsService {
 
   constructor(
-    @Inject(PRODUCT_SERVICES) private productClient: ClientProxy,
+    @Inject(NATS_SERVICE) private client: ClientProxy,
   ) {}
   async create(createProductDto: CreateProductDto) {
     try {
 
-      return await firstValueFrom( this.productClient.send({ cmd: 'createProduct'}, createProductDto) );
+      return await firstValueFrom( this.client.send({ cmd: 'createProduct'}, createProductDto) );
       
     } catch ( err ) {
 
@@ -27,7 +27,7 @@ export class ProductsService {
 
     try {
 
-      return await firstValueFrom( this.productClient.send({ cmd: 'findAllProducts'}, paginationDto) );
+      return await firstValueFrom( this.client.send({ cmd: 'findAllProducts'}, paginationDto) );
       
     } catch ( err ) {
       throw new RpcException(err);
@@ -41,7 +41,7 @@ export class ProductsService {
 
     try {
 
-      return await firstValueFrom( this.productClient.send({ cmd: 'findOneProduct'}, { id }) );
+      return await firstValueFrom( this.client.send({ cmd: 'findOneProduct'}, { id }) );
       
     } catch ( err ) {
       throw new RpcException(err);
@@ -53,7 +53,7 @@ export class ProductsService {
   async update(id: number, updateProductDto: UpdateProductDto) {
      try {
 
-      return await firstValueFrom( this.productClient.send({ cmd: 'updateProduct'}, { id, ...updateProductDto }) );
+      return await firstValueFrom( this.client.send({ cmd: 'updateProduct'}, { id, ...updateProductDto }) );
       
     } catch ( err ) {
 
@@ -65,7 +65,7 @@ export class ProductsService {
   async remove( id: number ) {
     try {
 
-      return await firstValueFrom( this.productClient.send({ cmd: 'removeProduct'}, { id }) );
+      return await firstValueFrom( this.client.send({ cmd: 'removeProduct'}, { id }) );
       
     } catch ( err ) {
 
