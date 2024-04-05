@@ -4,6 +4,8 @@ import { RpcException } from '@nestjs/microservices';
 
 @Catch(RpcException)
 export class RpcCustomExceptionFilter implements ExceptionFilter {
+
+  constructor() {}
   catch(exception: RpcException, host: ArgumentsHost) {
     // return throwError(() => exception.getError());
 
@@ -12,6 +14,18 @@ export class RpcCustomExceptionFilter implements ExceptionFilter {
     const response = ctx.getResponse();
 
     const rpcErr = exception.getError();
+
+    console.log(rpcErr.toString());
+    
+
+    if( rpcErr.toString().includes('Empty response') ) { 
+
+      return response.status(500).json({
+        statusCode: 500,
+        message: rpcErr.toString().substring(0, rpcErr.toString().indexOf('(') - 1)
+      });
+
+    }
 
     if (
       typeof rpcErr === 'object' &&
